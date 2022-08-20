@@ -1,0 +1,17 @@
+name: Build Tests
+on: [push]
+
+jobs:
+  test:
+    name: Snowflake Nightly
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '-skip ci')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly   
+      - uses: actions-rs/cargo@v1
+        with:
+          toolchain: nightly
+          command: test
