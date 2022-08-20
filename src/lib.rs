@@ -1,4 +1,4 @@
 pub mod snowflake;
 pub mod generator;
 
-pub use snowflake::Snowflake;
+pub use self::snowflake::Snowflake;
