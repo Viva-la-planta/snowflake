@@ -20,6 +20,6 @@ impl Pool {
 
     pub fn generate(&mut self) -> Snowflake {
         self.increment += 1;
-        Snowflake::create(self.worker_id, process::id().into(), self.increment)
+        Snowflake::create(self.worker_id.into(), process::id().into(), self.increment.into())
     }
 }

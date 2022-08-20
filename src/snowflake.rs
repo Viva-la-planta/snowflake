@@ -1,7 +1,15 @@
 use std::time::{SystemTime, Duration, UNIX_EPOCH};
 
-// A snowflake              1420070400000
-pub const VIVA_EPOCH: u64 = 1660769388000;
+// A snowflake               1420070400000
+pub const VIVA_EPOCH: u128 = 1660769388000;
+
+pub const WORKER_BITS: u8 = 5;
+pub const PROCESS_BITS: u8 = 5;
+pub const INCREMENT_BITS: u8 = 12;
+pub const MAX_WORKER_ID: u32 = 1 << WORKER_BITS;
+pub const MAX_PROCESS_ID: u32 = 1 << PROCESS_BITS;
+pub const MAX_INCREMENT_ID: u32 = 1 << INCREMENT_BITS;
+pub const MAX_TIMESTAMP: u64 = 1 << (64 - WORKER_BITS - PROCESS_BITS - INCREMENT_BITS);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Snowflake {
@@ -15,6 +23,20 @@ pub struct Snowflake {
 impl Snowflake {
     pub fn new(id: u64) -> Self {
         Self::from_id(id)
+    }
+
+    pub fn init_from(id: u64, timestamp: u64, worker_id: u64, process_id: u64, increment: u64) -> Self {
+        Self {
+            id,
+            timestamp,
+            worker_id,
+            process_id,
+            increment,
+        }
+    }
+
+    pub fn get_timestamp_at(&self) -> u64 {
+        ((self.timestamp as u128) + VIVA_EPOCH) as u64
     }
 
     /// A method to get the current timestamp.
@@ -37,12 +59,16 @@ impl Snowflake {
         self.increment
     }
 
+    pub fn get_id(&self) -> u64 {
+        self.id
+    }
+
 
     /// This function will create a Snowflake from the current time, the worker ID, the process ID, and an increment.
     /// The increment is used to ensure that IDs are unique across a worker process.
     pub fn create(worker_id: u64, process_id: u64, increment: u64) -> Self {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-        let timestamp = now - VIVA_EPOCH;
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+        let timestamp: u64 = ((now - VIVA_EPOCH) % (MAX_TIMESTAMP as u128)).try_into().unwrap();
         Snowflake {
             id: Self::generate_id(timestamp, worker_id, process_id, increment),
             timestamp: timestamp,
@@ -67,11 +93,10 @@ impl Snowflake {
     }
 
     fn generate_id(timestamp: u64, worker_id: u64, process_id: u64, increment: u64) -> u64 {
-        let mut id = 0;
-        id |= timestamp << 22;
-        id |= worker_id << 17;
-        id |= process_id << 12;
-        id |= increment << 0;
+        let mut id = timestamp << WORKER_BITS << PROCESS_BITS << INCREMENT_BITS;
+        id |= (worker_id % (MAX_WORKER_ID as u64)) << PROCESS_BITS << INCREMENT_BITS;
+        id |= (process_id % (MAX_PROCESS_ID as u64)) << INCREMENT_BITS;
+        id |=  increment % MAX_INCREMENT_ID as u64;
         id
     }
 }
