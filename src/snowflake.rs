@@ -1,4 +1,6 @@
-use std::time::{SystemTime, Duration, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
+#[cfg(feature = "serialize")]
+use serde::{Serialize, Deserialize};
 
 // A snowflake               1420070400000
 pub const VIVA_EPOCH: u128 = 1660769388000;
@@ -11,7 +13,9 @@ pub const MAX_PROCESS_ID: u32 = 1 << PROCESS_BITS;
 pub const MAX_INCREMENT_ID: u32 = 1 << INCREMENT_BITS;
 pub const MAX_TIMESTAMP: u64 = 1 << (64 - WORKER_BITS - PROCESS_BITS - INCREMENT_BITS);
 
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serialize", derive(Serialize), derive(Deserialize))]
 pub struct Snowflake {
     pub id: u64,
     timestamp: u64,
