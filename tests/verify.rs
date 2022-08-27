@@ -9,3 +9,11 @@ fn test_pool() {
 
     assert_eq!(generated.get_timestamp_at(), snf.get_timestamp_at());
 }
+
+#[test]
+fn test_id() {
+    let snowflake: Snowflake = "1100578097115137".into();
+    let generated = Snowflake::new(1100578097115137);
+
+    assert_eq!(snowflake.get_timestamp_at(), generated.get_timestamp_at());
+}

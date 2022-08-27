@@ -104,3 +104,21 @@ impl Snowflake {
         id
     }
 }
+
+impl From<&str> for Snowflake {
+    fn from(s: &str) -> Self {
+        Snowflake::new(s.parse::<u64>().unwrap())
+    }
+}
+
+impl From<String> for Snowflake {
+    fn from(s: String) -> Self {
+        Snowflake::new(s.parse::<u64>().unwrap())
+    }
+}
+
+impl Into<String> for Snowflake {
+    fn into(self) -> String {
+        self.id.to_string()
+    }
+}
