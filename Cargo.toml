@@ -2,10 +2,3 @@
 name = "snowflake"
 version = "0.1.0"
 edition = "2021"
-
-[features]
-default = []
-serialize = [ "serde" ]
-
-[dependencies]
-serde = { version = "1.0.144", features = [ "derive" ], optional = true }
