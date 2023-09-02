@@ -68,7 +68,7 @@ impl Snowflake {
     /// This function will create a Snowflake from the current time, the worker ID, the process ID, and an increment.
     /// The increment is used to ensure that IDs are unique across a worker process.
     pub fn create(worker_id: u64, process_id: u64, increment: u64) -> Self {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
         let timestamp: u64 = ((now - VIVA_EPOCH) % (MAX_TIMESTAMP as u128)).try_into().unwrap();
         Snowflake {
             id: Self::generate_id(timestamp, worker_id, process_id, increment),
